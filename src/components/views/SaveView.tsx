@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 export function SaveView() {
   const [vaults, setVaults] = useState([]);
@@ -14,6 +15,14 @@ export function SaveView() {
       .catch(console.error);
   }, []);
 
+  const handleDeposit = (vaultName: string) => {
+    toast.success(`Simulated deposit into ${vaultName} vault!`);
+  };
+
+  const handleNewVault = () => {
+    toast.info("Create new vault modal coming soon.");
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -21,7 +30,7 @@ export function SaveView() {
           <h2 className="text-3xl font-bold tracking-tight">Savings Vaults</h2>
           <p className="text-muted-foreground">Earn yield and track your financial goals.</p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={handleNewVault}>
           <Plus className="h-4 w-4" /> New Vault
         </Button>
       </div>
@@ -48,7 +57,7 @@ export function SaveView() {
                 </div>
                 <Progress value={progress} className="h-2" />
                 <div className="flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="w-full">Deposit</Button>
+                  <Button variant="outline" size="sm" className="w-full" onClick={() => handleDeposit(v.name)}>Deposit</Button>
                   <Button variant="ghost" size="sm" className="w-full">Manage</Button>
                 </div>
               </CardContent>

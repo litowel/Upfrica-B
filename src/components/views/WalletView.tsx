@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowRightLeft } from "lucide-react";
+import { toast } from "sonner";
 
 export function WalletView() {
   const [balances, setBalances] = useState([]);
@@ -12,6 +13,14 @@ export function WalletView() {
       .then(data => setBalances(data.balances))
       .catch(console.error);
   }, []);
+
+  const handleAddFunds = (currency: string) => {
+    toast.success(`Initiating deposit flow for ${currency}...`);
+  };
+
+  const handleSwap = (currency: string) => {
+    toast.info(`Swap interface for ${currency} coming soon.`);
+  };
 
   return (
     <div className="space-y-6">
@@ -33,10 +42,20 @@ export function WalletView() {
                 {b.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </div>
               <div className="mt-4 flex gap-2">
-                <Button variant={b.currency === "USD" ? "secondary" : "outline"} size="sm" className="w-full">
+                <Button 
+                  variant={b.currency === "USD" ? "secondary" : "outline"} 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => handleAddFunds(b.currency)}
+                >
                   <Plus className="h-4 w-4 mr-1" /> Add
                 </Button>
-                <Button variant={b.currency === "USD" ? "secondary" : "outline"} size="sm" className="w-full">
+                <Button 
+                  variant={b.currency === "USD" ? "secondary" : "outline"} 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => handleSwap(b.currency)}
+                >
                   <ArrowRightLeft className="h-4 w-4 mr-1" /> Swap
                 </Button>
               </div>

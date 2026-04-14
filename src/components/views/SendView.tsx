@@ -1,11 +1,54 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, Repeat } from "lucide-react";
+import { Users, Repeat, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function SendView() {
+  const [recipient, setRecipient] = useState("");
+  const [amount, setAmount] = useState("");
+  const [currency, setCurrency] = useState("USD");
+  const [loading, setLoading] = useState(false);
+
+  const handleSend = async () => {
+    if (!recipient || !amount) {
+      toast.error("Please enter a recipient and amount.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/transactions/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fromUserId: "current-user",
+          toAddress: recipient,
+          amount: parseFloat(amount),
+          currency,
+          isRecurring: false
+        })
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        toast.success(`Successfully sent ${amount} ${currency} to ${recipient}`);
+        setRecipient("");
+        setAmount("");
+      } else {
+        toast.error(data.error || "Transaction failed");
+      }
+    } catch (err) {
+      toast.error("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -22,16 +65,25 @@ export function SendView() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Recipient</Label>
-              <Input placeholder="name@example.com or 0x..." />
+              <Input 
+                placeholder="name@example.com or 0x..." 
+                value={recipient}
+                onChange={(e) => setRecipient(e.target.value)}
+              />
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2 space-y-2">
                 <Label>Amount</Label>
-                <Input type="number" placeholder="0.00" />
+                <Input 
+                  type="number" 
+                  placeholder="0.00" 
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Currency</Label>
-                <Select defaultValue="USD">
+                <Select value={currency} onValueChange={setCurrency}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -43,7 +95,9 @@ export function SendView() {
                 </Select>
               </div>
             </div>
-            <Button className="w-full">Review Transfer</Button>
+            <Button className="w-full" onClick={handleSend} disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Review Transfer"}
+            </Button>
           </CardContent>
         </Card>
 
@@ -57,7 +111,12 @@ export function SendView() {
             <CardContent>
               <div className="space-y-2">
                 {["Alice Johnson", "Bob Smith", "Upfrica Store"].map((name, i) => (
-                  <Button key={i} variant="outline" className="w-full justify-start">
+                  <Button 
+                    key={i} 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => setRecipient(name.toLowerCase().replace(" ", "") + "@example.com")}
+                  >
                     {name}
                   </Button>
                 ))}
@@ -72,7 +131,13 @@ export function SendView() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Button variant="secondary" className="w-full">Setup Salary or Subscription</Button>
+              <Button 
+                variant="secondary" 
+                className="w-full"
+                onClick={() => toast.info("Recurring transfers setup coming soon!")}
+              >
+                Setup Salary or Subscription
+              </Button>
             </CardContent>
           </Card>
         </div>

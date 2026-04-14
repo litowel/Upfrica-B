@@ -1,10 +1,33 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, Store } from "lucide-react";
+import { QrCode, Store, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function PayView() {
+  const [merchantId, setMerchantId] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleVerifyMerchant = () => {
+    if (!merchantId) {
+      toast.error("Please enter a merchant ID");
+      return;
+    }
+    
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      toast.success(`Merchant ${merchantId} verified! Proceeding to checkout...`);
+      setMerchantId("");
+    }, 1500);
+  };
+
+  const handleScan = () => {
+    toast.info("Camera access requested. Please allow permissions.");
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -22,7 +45,7 @@ export function PayView() {
             <div className="p-8 bg-zinc-100 rounded-xl border-2 border-dashed border-zinc-300">
               <QrCode className="h-16 w-16 text-zinc-400" />
             </div>
-            <Button variant="outline" className="w-full">Open Camera</Button>
+            <Button variant="outline" className="w-full" onClick={handleScan}>Open Camera</Button>
           </CardContent>
         </Card>
 
@@ -34,10 +57,15 @@ export function PayView() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Merchant ID</Label>
-              <Input placeholder="UPF-..." />
+              <Input 
+                placeholder="UPF-..." 
+                value={merchantId}
+                onChange={(e) => setMerchantId(e.target.value)}
+              />
             </div>
-            <Button className="w-full gap-2">
-              <Store className="h-4 w-4" /> Verify Merchant
+            <Button className="w-full gap-2" onClick={handleVerifyMerchant} disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Store className="h-4 w-4" />}
+              {loading ? "Verifying..." : "Verify Merchant"}
             </Button>
           </CardContent>
         </Card>

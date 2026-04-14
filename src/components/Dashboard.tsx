@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
-import { inAppWallet } from "thirdweb/wallets";
-import { client } from "../lib/thirdweb";
+import { client, wallets } from "../lib/thirdweb";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -14,14 +13,6 @@ export function Dashboard() {
   const account = useActiveAccount();
   const [balance, setBalance] = useState("0.00");
   const [currency, setCurrency] = useState("NGN");
-
-  const wallets = [
-    inAppWallet({
-      auth: {
-        options: ["email", "phone", "google", "apple"],
-      },
-    }),
-  ];
 
   if (!account) {
     return (

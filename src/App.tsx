@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
-import { inAppWallet } from "thirdweb/wallets";
-import { client } from "./lib/thirdweb";
+import { client, wallets } from "./lib/thirdweb";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { WalletView } from "./components/views/WalletView";
 import { SendView } from "./components/views/SendView";
@@ -12,19 +11,12 @@ import { HistoryView } from "./components/views/HistoryView";
 import { AdminDashboard } from "./components/AdminDashboard";
 import { Button } from "@/components/ui/button";
 import { Globe2, ShieldCheck } from "lucide-react";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function App() {
   const [view, setView] = useState<"user" | "admin">("user");
   const [activeModule, setActiveModule] = useState("wallet");
   const account = useActiveAccount();
-
-  const wallets = [
-    inAppWallet({
-      auth: {
-        options: ["email", "phone", "google", "apple"],
-      },
-    }),
-  ];
 
   const renderModule = () => {
     if (view === "admin") return <AdminDashboard />;
@@ -103,6 +95,7 @@ export default function App() {
           {renderModule()}
         </DashboardLayout>
       )}
+      <Toaster />
     </div>
   );
 }
